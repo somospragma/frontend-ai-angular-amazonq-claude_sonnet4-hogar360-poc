@@ -1,0 +1,16 @@
+export const APP_CONSTANTS = {
+  APP_NAME: 'Hogar360',
+  API_BASE_URL: 'http://localhost:3000/api',
+  STORAGE_KEYS: {
+    TOKEN: 'hogar360_token',
+    USER: 'hogar360_user'
+  },
+  VALIDATION: {
+    MAX_CATEGORY_NAME_LENGTH: 50,
+    MAX_CATEGORY_DESCRIPTION_LENGTH: 90,
+    MAX_LOCATION_NAME_LENGTH: 50,
+    MAX_LOCATION_DESCRIPTION_LENGTH: 120,
+    MAX_PHONE_LENGTH: 13,
+    MIN_AGE: 18
+  }
+} as const;
