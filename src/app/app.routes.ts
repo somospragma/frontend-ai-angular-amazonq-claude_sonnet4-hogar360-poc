@@ -18,6 +18,10 @@ export const routes: Routes = [
         loadChildren: () => import('./features/locations/locations.routes').then(m => m.LOCATIONS_ROUTES)
       },
       {
+        path: 'schedules',
+        loadChildren: () => import('./features/schedules/schedules.routes').then(m => m.SCHEDULES_ROUTES)
+      },
+      {
         path: 'auth',
         loadChildren: () => import('./features/auth/auth.routes').then(m => m.AUTH_ROUTES)
       }

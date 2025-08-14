@@ -124,6 +124,72 @@ export class ScheduleService {
     }).pipe(delay(500));
   }
 
+  getPublicSchedules(options?: any): Observable<{schedules: Schedule[], total: number, page: number, totalPages: number}> {
+    const page = options?.page || 1;
+    const pageSize = options?.pageSize || 10;
+    const fechaInicio = options?.fechaInicio;
+    const fechaFin = options?.fechaFin;
+    const ubicacionId = options?.ubicacionId;
+    
+    const ahora = new Date();
+    
+    // Obtener propiedades para filtrar por ubicación
+    const storedProperties = localStorage.getItem('hogar360_properties');
+    const properties = storedProperties ? JSON.parse(storedProperties) : [];
+    
+    let filteredSchedules = this.schedules.filter(schedule => {
+      const fechaHoraInicio = new Date(schedule.fechaHoraInicio);
+      
+      // No mostrar horarios pasados
+      if (fechaHoraInicio <= ahora) return false;
+      
+      // TODO: Filtrar por cantidad de personas agendadas < 2
+      // Por ahora asumimos que todos están disponibles
+      
+      return true;
+    });
+    
+    // Aplicar filtros de fecha
+    if (fechaInicio) {
+      const fechaInicioFilter = new Date(fechaInicio);
+      filteredSchedules = filteredSchedules.filter(s => 
+        new Date(s.fechaHoraInicio) >= fechaInicioFilter
+      );
+    }
+    
+    if (fechaFin) {
+      const fechaFinFilter = new Date(fechaFin);
+      filteredSchedules = filteredSchedules.filter(s => 
+        new Date(s.fechaHoraFin) <= fechaFinFilter
+      );
+    }
+    
+    // Filtrar por ubicación
+    if (ubicacionId) {
+      filteredSchedules = filteredSchedules.filter(schedule => {
+        const property = properties.find((p: any) => p.id === schedule.casaId);
+        return property && property.ubicacionId === ubicacionId;
+      });
+    }
+    
+    // Ordenar por fecha y hora de inicio en orden descendente
+    filteredSchedules.sort((a, b) => 
+      new Date(b.fechaHoraInicio).getTime() - new Date(a.fechaHoraInicio).getTime()
+    );
+    
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedSchedules = filteredSchedules.slice(startIndex, endIndex);
+    const totalPages = Math.ceil(filteredSchedules.length / pageSize);
+
+    return of({
+      schedules: paginatedSchedules,
+      total: filteredSchedules.length,
+      page,
+      totalPages
+    }).pipe(delay(500));
+  }
+
   deleteSchedule(id: string, vendedorId: string): Observable<void> {
     const schedule = this.schedules.find(s => s.id === id);
     

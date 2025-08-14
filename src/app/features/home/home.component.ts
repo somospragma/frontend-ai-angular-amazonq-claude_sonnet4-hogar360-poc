@@ -18,7 +18,7 @@ import { AuthService } from '../../core/services/auth.service';
             </div>
             <div class="flex items-center space-x-8">
               <a routerLink="/properties" class="text-gray-600 hover:text-gray-900">Propiedades</a>
-              <a href="#" class="text-gray-600 hover:text-gray-900">Renta</a>
+              <a routerLink="/schedules" class="text-gray-600 hover:text-gray-900">Horarios</a>
               <a href="#" class="text-gray-600 hover:text-gray-900">Vende</a>
               <a routerLink="/locations" class="text-gray-600 hover:text-gray-900">Ubicaciones</a>
               <a routerLink="/admin" class="text-gray-600 hover:text-gray-900">Administración</a>

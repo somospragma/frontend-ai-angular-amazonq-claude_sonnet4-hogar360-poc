@@ -86,7 +86,17 @@ import { AuthService } from '../../core/services/auth.service';
                 <svg class="w-3.5 h-3.5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4m-6 0V6a2 2 0 012-2h4a2 2 0 012 2v1m-6 0h8m-8 0H6a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V9a2 2 0 00-2-2h-2"></path>
                 </svg>
-                Horarios
+                Mis Horarios
+              </a>
+              
+              <a routerLink="/admin/schedules/available" 
+                 routerLinkActive="bg-blue-50 text-blue-600"
+                 class="flex items-center px-2 py-2 text-sm text-gray-600 rounded hover:bg-gray-50">
+                <svg class="w-3.5 h-3.5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                </svg>
+                Ver Horarios
               </a>
               
               <a href="#" class="flex items-center px-2 py-2 text-sm text-gray-600 rounded hover:bg-gray-50">

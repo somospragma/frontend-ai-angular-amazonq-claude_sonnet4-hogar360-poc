@@ -11,5 +11,10 @@ export const ADMIN_SCHEDULES_ROUTES: Routes = [
     path: 'create',
     loadComponent: () => import('./admin-schedule-create.component').then(m => m.AdminScheduleCreateComponent),
     canActivate: [authGuard]
+  },
+  {
+    path: 'available',
+    loadComponent: () => import('./admin-public-schedule-list.component').then(m => m.AdminPublicScheduleListComponent),
+    canActivate: [authGuard]
   }
 ];
