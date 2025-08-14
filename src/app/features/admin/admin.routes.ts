@@ -1,5 +1,8 @@
 import { Routes } from '@angular/router';
+import { inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { adminGuard } from '../../core/guards/auth.guard';
+import { AuthService } from '../../core/services/auth.service';
 
 export const ADMIN_ROUTES: Routes = [
   {

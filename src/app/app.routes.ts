@@ -13,10 +13,7 @@ export const routes: Routes = [
         path: 'properties',
         loadChildren: () => import('./features/properties/properties.routes').then(m => m.PROPERTIES_ROUTES)
       },
-      {
-        path: 'categories',
-        loadChildren: () => import('./features/categories/categories.routes').then(m => m.CATEGORIES_ROUTES)
-      },
+
       {
         path: 'auth',
         loadChildren: () => import('./features/auth/auth.routes').then(m => m.AUTH_ROUTES)

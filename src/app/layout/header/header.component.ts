@@ -25,11 +25,8 @@ import { UserRole } from '../../shared/models';
                class="text-gray-700 hover:text-primary-600 px-3 py-2 text-sm font-medium">
               Propiedades
             </a>
-            <a routerLink="/categories" 
-               class="text-gray-700 hover:text-primary-600 px-3 py-2 text-sm font-medium">
-              Categorías
-            </a>
-            <a *ngIf="authService.isAdmin()" 
+
+            <a *ngIf="authService.isAuthenticated()" 
                routerLink="/admin" 
                class="text-gray-700 hover:text-primary-600 px-3 py-2 text-sm font-medium">
               Administración

@@ -78,6 +78,11 @@ export class LoginComponent {
       correo: ['', [Validators.required, Validators.email]],
       clave: ['', [Validators.required, Validators.minLength(6)]]
     });
+    
+    // Si ya está logueado, redirigir al admin
+    if (this.authService.isAuthenticated()) {
+      this.router.navigate(['/admin']);
+    }
   }
 
   onSubmit(): void {
@@ -88,7 +93,7 @@ export class LoginComponent {
       this.authService.login(this.loginForm.value).subscribe({
         next: () => {
           this.isLoading = false;
-          this.router.navigate(['/']);
+          this.router.navigate(['/admin']);
         },
         error: (error) => {
           this.isLoading = false;

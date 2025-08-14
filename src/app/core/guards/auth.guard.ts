@@ -23,12 +23,7 @@ export const adminGuard: CanActivateFn = () => {
     return false;
   }
 
-  if (authService.isAdmin()) {
-    return true;
-  }
-
-  router.navigate(['/']);
-  return false;
+  return true;
 };
 
 export const vendedorGuard: CanActivateFn = () => {

@@ -30,8 +30,42 @@ export class CategoryService {
     this.storageService.setItem(this.STORAGE_KEY, categories);
   }
 
-  getCategories(): Observable<Category[]> {
-    return of(this.categoriesSignal()).pipe(delay(500));
+  getCategories(options?: {
+    page?: number;
+    pageSize?: number;
+    includeAll?: boolean;
+  }): Observable<{
+    categories: Category[];
+    total: number;
+    page: number;
+    pageSize: number;
+    totalPages: number;
+  }> {
+    const { page = 1, pageSize = 10, includeAll = false } = options || {};
+    const allCategories = this.categoriesSignal();
+    
+    if (includeAll) {
+      return of({
+        categories: allCategories,
+        total: allCategories.length,
+        page: 1,
+        pageSize: allCategories.length,
+        totalPages: 1
+      }).pipe(delay(500));
+    }
+
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedCategories = allCategories.slice(startIndex, endIndex);
+    const totalPages = Math.ceil(allCategories.length / pageSize);
+
+    return of({
+      categories: paginatedCategories,
+      total: allCategories.length,
+      page,
+      pageSize,
+      totalPages
+    }).pipe(delay(500));
   }
 
   createCategory(request: CreateCategoryRequest): Observable<Category> {
