@@ -64,7 +64,7 @@ import { CategoryService } from '../../../core/services/category.service';
         <!-- Quick Actions -->
         <div class="bg-white rounded-lg shadow p-6" *ngIf="authService.isAdmin()">
           <h3 class="text-lg font-semibold text-gray-900 mb-4">Acciones Rápidas</h3>
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <a routerLink="/admin/categories/create" 
                class="block p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-md transition-all">
               <div class="flex items-center">
@@ -107,6 +107,37 @@ import { CategoryService } from '../../../core/services/category.service';
                 <div class="ml-3">
                   <h4 class="text-sm font-medium text-gray-900">Ver Categorías</h4>
                   <p class="text-xs text-gray-500">Administrar categorías</p>
+                </div>
+              </div>
+            </a>
+            
+            <a routerLink="/admin/users/create" 
+               class="block p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-md transition-all">
+              <div class="flex items-center">
+                <div class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+                  <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                  </svg>
+                </div>
+                <div class="ml-3">
+                  <h4 class="text-sm font-medium text-gray-900">Crear Vendedor</h4>
+                  <p class="text-xs text-gray-500">Nuevo usuario vendedor</p>
+                </div>
+              </div>
+            </a>
+            
+            <a *ngIf="authService.isVendedor()" 
+               routerLink="/admin/properties/create" 
+               class="block p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-md transition-all">
+              <div class="flex items-center">
+                <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
+                  <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                </div>
+                <div class="ml-3">
+                  <h4 class="text-sm font-medium text-gray-900">Publicar Casa</h4>
+                  <p class="text-xs text-gray-500">Nueva propiedad</p>
                 </div>
               </div>
             </a>

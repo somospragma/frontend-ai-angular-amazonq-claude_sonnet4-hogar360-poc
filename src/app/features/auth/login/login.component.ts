@@ -23,9 +23,21 @@ import { AuthService } from '../../../core/services/auth.service';
         <div class="bg-blue-50 border border-blue-200 rounded-md p-4">
           <h3 class="text-sm font-medium text-blue-800 mb-2">Credenciales de prueba:</h3>
           <div class="text-xs text-blue-700 space-y-1">
-            <p><strong>Admin:</strong> admin[at]hogar360.com / password123</p>
-            <p><strong>Vendedor:</strong> vendedor[at]hogar360.com / password123</p>
-            <p><strong>Comprador:</strong> comprador[at]hogar360.com / password123</p>
+            <p><strong>Admin:</strong> admin&#64;hogar360.com / password123</p>
+            <p><strong>Vendedor:</strong> vendedor&#64;hogar360.com / password123</p>
+            <p><strong>Comprador:</strong> comprador&#64;hogar360.com / password123</p>
+          </div>
+          <div class="mt-2 space-x-2">
+            <button type="button" 
+                    (click)="resetUserData()"
+                    class="text-xs text-blue-600 hover:text-blue-800 underline">
+              Resetear datos de usuarios
+            </button>
+            <button type="button" 
+                    (click)="debugUsers()"
+                    class="text-xs text-green-600 hover:text-green-800 underline">
+              Debug contraseñas
+            </button>
           </div>
         </div>
 
@@ -39,14 +51,14 @@ import { AuthService } from '../../../core/services/auth.service';
               <input id="correo" 
                      type="email" 
                      formControlName="correo"
-                     class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm" 
+                     class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm" 
                      placeholder="Correo electrónico">
             </div>
             <div>
               <input id="clave" 
                      type="password" 
                      formControlName="clave"
-                     class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm" 
+                     class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm" 
                      placeholder="Contraseña">
             </div>
           </div>
@@ -54,7 +66,7 @@ import { AuthService } from '../../../core/services/auth.service';
           <div>
             <button type="submit" 
                     [disabled]="loginForm.invalid || isLoading"
-                    class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed">
+                    class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed">
               <span *ngIf="isLoading" class="mr-2">⏳</span>
               {{ isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión' }}
             </button>
@@ -100,6 +112,30 @@ export class LoginComponent {
           this.errorMessage = error.message || 'Error al iniciar sesión';
         }
       });
+    }
+  }
+
+  resetUserData(): void {
+    localStorage.removeItem('hogar360_users');
+    localStorage.removeItem('hogar360_token');
+    localStorage.removeItem('hogar360_user');
+    alert('Datos de usuarios reseteados. Ahora puedes usar las credenciales por defecto.');
+    window.location.reload();
+  }
+
+  debugUsers(): void {
+    const stored = localStorage.getItem('hogar360_users');
+    if (stored) {
+      const users = JSON.parse(stored);
+      console.log('Usuarios almacenados:', users.map((u: any) => ({
+        correo: u.correo,
+        clave: u.clave,
+        claveLength: u.clave?.length,
+        isBcryptHash: u.clave?.startsWith('$2') || false
+      })));
+      alert('Revisa la consola del navegador para ver el estado de las contraseñas');
+    } else {
+      alert('No hay usuarios almacenados');
     }
   }
 }

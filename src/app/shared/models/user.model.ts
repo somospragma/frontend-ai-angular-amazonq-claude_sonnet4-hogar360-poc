@@ -6,6 +6,7 @@ export interface User {
   celular: string;
   fechaNacimiento: string;
   correo: string;
+  clave?: string;
   rol: UserRole;
 }
 
@@ -23,4 +24,14 @@ export interface LoginRequest {
 export interface AuthResponse {
   user: User;
   token: string;
+}
+
+export interface CreateUserRequest {
+  nombre: string;
+  apellido: string;
+  documento: string;
+  celular: string;
+  fechaNacimiento: string;
+  correo: string;
+  clave: string;
 }

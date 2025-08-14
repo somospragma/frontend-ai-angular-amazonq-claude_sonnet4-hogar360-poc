@@ -3,6 +3,7 @@ import { Observable, of, throwError } from 'rxjs';
 import { delay, map } from 'rxjs/operators';
 import { User, UserRole, LoginRequest, AuthResponse } from '../../shared/models';
 import { APP_CONSTANTS } from '../../shared/constants/app.constants';
+import { CryptoService } from './crypto.service';
 
 @Injectable({
   providedIn: 'root'
@@ -13,49 +14,65 @@ export class AuthService {
   public isAuthenticated = computed(() => this.currentUserSignal() !== null);
   public isAdmin = computed(() => this.currentUserSignal()?.rol === UserRole.ADMIN);
   public isVendedor = computed(() => this.currentUserSignal()?.rol === UserRole.VENDEDOR);
+  private cryptoService = inject(CryptoService);
 
-  // Mock users for testing
-  private mockUsers: User[] = [
-    {
-      id: '1',
-      nombre: 'Admin',
-      apellido: 'Sistema',
-      documento: '12345678',
-      celular: '+573001234567',
-      fechaNacimiento: '1990-01-01',
-      correo: 'admin@hogar360.com',
-      rol: UserRole.ADMIN
-    },
-    {
-      id: '2',
-      nombre: 'Juan',
-      apellido: 'Vendedor',
-      documento: '87654321',
-      celular: '+573007654321',
-      fechaNacimiento: '1985-05-15',
-      correo: 'vendedor@hogar360.com',
-      rol: UserRole.VENDEDOR
-    },
-    {
-      id: '3',
-      nombre: 'María',
-      apellido: 'Compradora',
-      documento: '11223344',
-      celular: '+573009876543',
-      fechaNacimiento: '1992-08-20',
-      correo: 'comprador@hogar360.com',
-      rol: UserRole.COMPRADOR
+  private getAllUsers(): User[] {
+    const stored = localStorage.getItem('hogar360_users');
+    if (stored) {
+      return JSON.parse(stored);
     }
-  ];
+    
+    // Si no hay usuarios, crear usuarios por defecto
+    const hashedPassword = this.cryptoService.hashPassword('password123');
+    const defaultUsers = [
+      {
+        id: '1',
+        nombre: 'Admin',
+        apellido: 'Sistema',
+        documento: '12345678',
+        celular: '+573001234567',
+        fechaNacimiento: '1990-01-01',
+        correo: 'admin@hogar360.com',
+        clave: hashedPassword,
+        rol: UserRole.ADMIN
+      },
+      {
+        id: '2',
+        nombre: 'Juan',
+        apellido: 'Vendedor',
+        documento: '87654321',
+        celular: '+573007654321',
+        fechaNacimiento: '1985-05-15',
+        correo: 'vendedor@hogar360.com',
+        clave: hashedPassword,
+        rol: UserRole.VENDEDOR
+      },
+      {
+        id: '3',
+        nombre: 'María',
+        apellido: 'Compradora',
+        documento: '11223344',
+        celular: '+573009876543',
+        fechaNacimiento: '1992-08-20',
+        correo: 'comprador@hogar360.com',
+        clave: hashedPassword,
+        rol: UserRole.COMPRADOR
+      }
+    ];
+    
+    localStorage.setItem('hogar360_users', JSON.stringify(defaultUsers));
+    return defaultUsers;
+  }
 
   constructor() {
     this.loadUserFromStorage();
   }
 
   login(credentials: LoginRequest): Observable<AuthResponse> {
-    const user = this.mockUsers.find(u => u.correo === credentials.correo);
+    const users = this.getAllUsers();
+    const user = users.find(u => u.correo === credentials.correo);
     
-    if (!user || credentials.clave !== 'password123') {
+    if (!user || !this.cryptoService.comparePassword(credentials.clave, user.clave || '')) {
       return throwError(() => new Error('Credenciales inválidas')).pipe(delay(1000));
     }
 

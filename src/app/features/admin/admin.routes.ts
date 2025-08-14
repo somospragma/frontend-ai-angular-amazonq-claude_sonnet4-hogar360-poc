@@ -21,6 +21,14 @@ export const ADMIN_ROUTES: Routes = [
       {
         path: 'locations',
         loadComponent: () => import('./locations/admin-location-list.component').then(m => m.AdminLocationListComponent)
+      },
+      {
+        path: 'users',
+        loadChildren: () => import('./users/admin-users.routes').then(m => m.ADMIN_USERS_ROUTES)
+      },
+      {
+        path: 'properties',
+        loadChildren: () => import('./properties/admin-properties.routes').then(m => m.ADMIN_PROPERTIES_ROUTES)
       }
     ]
   }

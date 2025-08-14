@@ -2,16 +2,13 @@ export interface Property {
   id: string;
   nombre: string;
   descripcion: string;
-  categoria: string;
+  categoriaId: string;
   cantidadCuartos: number;
   cantidadBanos: number;
   precio: number;
-  ubicacion: {
-    ciudad: string;
-    departamento: string;
-  };
+  ubicacionId: string;
   fechaPublicacionActiva: string;
-  estado: PropertyStatus;
+  estadoPublicacion: PropertyStatus;
   fechaPublicacion: string;
   vendedorId: string;
 }
