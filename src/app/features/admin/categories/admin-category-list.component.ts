@@ -5,149 +5,148 @@ import { CategoryService } from '../../../core/services/category.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { Category } from '../../../shared/models';
 import { APP_CONSTANTS } from '../../../shared/constants/app.constants';
-import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 
 @Component({
   selector: 'app-admin-category-list',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, PaginationComponent],
+  imports: [CommonModule, ReactiveFormsModule],
   template: `
-    <div class="space-y-6">
-      <!-- Formulario de categoría -->
-      <div *ngIf="showCreateForm || editingCategory" class="bg-white rounded-lg shadow">
-        <div class="px-6 py-4 border-b border-gray-200">
-          <h3 class="text-lg font-semibold text-gray-900">
-            {{ editingCategory ? 'Editar Categoría' : 'Nueva Categoría' }}
-          </h3>
-        </div>
-        
-        <form [formGroup]="categoryForm" (ngSubmit)="onSubmit()" class="p-6 space-y-4">
-          <div *ngIf="errorMessage" class="bg-red-50 border border-red-200 rounded-md p-3">
+    <div>
+      <h1 class="text-2xl font-normal text-gray-900 mb-6">Crear Categoría</h1>
+      
+      <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
+        <form [formGroup]="categoryForm" (ngSubmit)="onSubmit()" class="space-y-6">
+          <div *ngIf="errorMessage" class="bg-red-50 border border-red-200 rounded-md p-4">
             <p class="text-sm text-red-600">{{ errorMessage }}</p>
           </div>
 
-          <div *ngIf="successMessage" class="bg-green-50 border border-green-200 rounded-md p-3">
+          <div *ngIf="successMessage" class="bg-green-50 border border-green-200 rounded-md p-4">
             <p class="text-sm text-green-600">{{ successMessage }}</p>
           </div>
 
           <div>
-            <label for="nombre" class="block text-sm font-medium text-gray-700 mb-1">
-              Nombre *
+            <label for="nombre" class="block text-sm font-normal text-gray-700 mb-2">
+              Nombre de la Categoría <span class="text-red-500">*</span>
             </label>
             <input id="nombre" 
                    type="text" 
                    formControlName="nombre"
                    maxlength="50"
-                   class="block w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                   [class.border-red-300]="categoryForm.get('nombre')?.invalid && categoryForm.get('nombre')?.touched">
+                   class="block w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                   [class.border-red-300]="categoryForm.get('nombre')?.invalid && categoryForm.get('nombre')?.touched"
+                   placeholder="Escribe el nombre de la categoría (máximo 50 caracteres)">
             <div class="mt-1 flex justify-between">
-              <div *ngIf="categoryForm.get('nombre')?.invalid && categoryForm.get('nombre')?.touched" class="text-xs text-red-600">
-                <span *ngIf="categoryForm.get('nombre')?.errors?.['required']">Requerido</span>
+              <div *ngIf="categoryForm.get('nombre')?.invalid && categoryForm.get('nombre')?.touched" class="text-sm text-red-600">
+                <span *ngIf="categoryForm.get('nombre')?.errors?.['required']">El nombre es requerido</span>
                 <span *ngIf="categoryForm.get('nombre')?.errors?.['maxlength']">Máximo 50 caracteres</span>
               </div>
-              <span class="text-xs text-gray-500">{{ categoryForm.get('nombre')?.value?.length || 0 }}/50</span>
             </div>
           </div>
 
           <div>
-            <label for="descripcion" class="block text-sm font-medium text-gray-700 mb-1">
-              Descripción *
+            <label for="descripcion" class="block text-sm font-normal text-gray-700 mb-2">
+              Descripción <span class="text-red-500">*</span>
             </label>
-            <textarea id="descripcion" 
-                      formControlName="descripcion"
-                      maxlength="90"
-                      rows="3"
-                      class="block w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      [class.border-red-300]="categoryForm.get('descripcion')?.invalid && categoryForm.get('descripcion')?.touched"></textarea>
-            <div class="mt-1 flex justify-between">
-              <div *ngIf="categoryForm.get('descripcion')?.invalid && categoryForm.get('descripcion')?.touched" class="text-xs text-red-600">
-                <span *ngIf="categoryForm.get('descripcion')?.errors?.['required']">Requerido</span>
+            <div class="relative">
+              <textarea id="descripcion" 
+                        formControlName="descripcion"
+                        maxlength="90"
+                        rows="4"
+                        class="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm resize-none"
+                        [class.border-red-300]="categoryForm.get('descripcion')?.invalid && categoryForm.get('descripcion')?.touched"
+                        placeholder="Enter category description"></textarea>
+              <div class="absolute bottom-2 right-2 text-xs text-gray-500">
+                {{ categoryForm.get('descripcion')?.value?.length || 0 }}/90
+              </div>
+            </div>
+            <div class="mt-1">
+              <div *ngIf="categoryForm.get('descripcion')?.invalid && categoryForm.get('descripcion')?.touched" class="text-sm text-red-600">
+                <span *ngIf="categoryForm.get('descripcion')?.errors?.['required']">La descripción es requerida</span>
                 <span *ngIf="categoryForm.get('descripcion')?.errors?.['maxlength']">Máximo 90 caracteres</span>
               </div>
-              <span class="text-xs text-gray-500">{{ categoryForm.get('descripcion')?.value?.length || 0 }}/90</span>
             </div>
           </div>
 
-          <div class="flex justify-end space-x-3 pt-4">
-            <button type="button" 
-                    (click)="cancelForm()"
-                    class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
-              Cancelar
-            </button>
+          <div class="flex justify-end">
             <button type="submit" 
                     [disabled]="categoryForm.invalid || isLoading"
-                    class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 disabled:opacity-50">
-              {{ isLoading ? 'Guardando...' : (editingCategory ? 'Actualizar' : 'Crear') }}
+                    class="px-9 py-2 bg-blue-600 text-white text-sm font-normal rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed">
+              <span *ngIf="isLoading" class="mr-2">⏳</span>
+              {{ isLoading ? 'Creando...' : 'Crear' }}
             </button>
           </div>
         </form>
       </div>
 
-      <!-- Lista de categorías -->
-      <div class="bg-white rounded-lg shadow">
-        <div class="px-6 py-4 border-b border-gray-200">
-          <div class="flex justify-between items-center">
-            <h2 class="text-lg font-semibold text-gray-900">Categorías</h2>
-            <button *ngIf="authService.isAdmin()" 
-                    (click)="showCreateForm = !showCreateForm"
-                    class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700">
-              {{ showCreateForm ? 'Cancelar' : '+ Nueva Categoría' }}
-            </button>
-          </div>
-        </div>
-          <div *ngIf="isLoading" class="flex justify-center py-8">
-            <div class="text-gray-500">Cargando categorías...</div>
-          </div>
-
-          <div *ngIf="!isLoading" class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-              <thead class="bg-gray-50">
-                <tr>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descripción</th>
-                  <th *ngIf="authService.isAdmin()" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
-                </tr>
-              </thead>
-              <tbody class="bg-white divide-y divide-gray-200">
-                <tr *ngFor="let category of categories" class="hover:bg-gray-50">
-                  <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="text-sm font-medium text-gray-900">{{ category.nombre }}</div>
-                  </td>
-                  <td class="px-6 py-4">
-                    <div class="text-sm text-gray-600">{{ category.descripcion }}</div>
-                  </td>
-                  <td *ngIf="authService.isAdmin()" class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button (click)="editCategory(category)" 
-                            class="text-blue-600 hover:text-blue-900 mr-4">
-                      Editar
-                    </button>
-                    <button (click)="deleteCategory(category)" 
-                            [disabled]="isDeleting"
-                            class="text-red-600 hover:text-red-900 disabled:opacity-50">
-                      {{ isDeleting && deletingId === category.id ? 'Eliminando...' : 'Eliminar' }}
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-        <div *ngIf="!isLoading && categories.length === 0" class="text-center py-12">
-          <div class="text-gray-500 mb-4">No hay categorías disponibles</div>
-          <p class="text-gray-500 text-sm">
-            {{ authService.isAdmin() ? 'Crea la primera categoría usando el botón superior' : 'Las categorías serán creadas por el administrador' }}
-          </p>
-        </div>
+      <h2 class="text-lg font-medium text-gray-900 mb-4">Categorías existentes</h2>
+      
+      <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+        <table class="min-w-full">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+              <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <tr *ngFor="let category of categories; let i = index">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">#CAT-{{ 2025001 + i }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ category.nombre }}</td>
+              <td class="px-6 py-4 text-sm text-gray-600">{{ category.descripcion }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
+                <button (click)="deleteCategory(category)" 
+                        [disabled]="isDeleting && deletingId === category.id"
+                        class="text-red-600 hover:text-red-900 disabled:opacity-50">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                  </svg>
+                </button>
+              </td>
+            </tr>
+            <!-- Datos de ejemplo si no hay categorías -->
+            <tr *ngIf="categories.length === 0">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">#CAT-2025001</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Casas de lujo</td>
+              <td class="px-6 py-4 text-sm text-gray-600">Propiedades residenciales con acabados de lujo</td>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
+                <button class="text-red-600 hover:text-red-900">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                  </svg>
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="categories.length === 0" class="border-t border-gray-200">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">#CAT-2025002</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Apartamentos</td>
+              <td class="px-6 py-4 text-sm text-gray-600">Espacios modernos y urbanos</td>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
+                <button class="text-red-600 hover:text-red-900">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                  </svg>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
         
-        <!-- Paginación -->
-        <app-pagination 
-          *ngIf="!isLoading"
-          [currentPage]="currentPage"
-          [totalPages]="totalPages"
-          [total]="totalCategories"
-          [pageSize]="pageSize"
-          (pageChange)="onPageChange($event)">
-        </app-pagination>
+        <!-- Pagination -->
+        <div class="bg-white px-4 py-3 flex items-center justify-center border-t border-gray-200">
+          <nav class="flex space-x-1">
+            <button class="px-3 py-2 text-sm font-medium text-white bg-blue-600 border border-gray-300 rounded">1</button>
+            <button class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded hover:bg-gray-50">2</button>
+            <button class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded hover:bg-gray-50">3</button>
+            <button class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded hover:bg-gray-50">4</button>
+            <button class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded hover:bg-gray-50">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </button>
+          </nav>
+        </div>
       </div>
     </div>
   `
@@ -158,62 +157,38 @@ export class AdminCategoryListComponent {
   public authService = inject(AuthService);
 
   categories: Category[] = [];
-  isLoading = true;
+  isLoading = false;
   isDeleting = false;
   deletingId = '';
-  showCreateForm = false;
-  editingCategory: Category | null = null;
   errorMessage = '';
   successMessage = '';
-  currentPage = 1;
-  pageSize = 5;
-  totalPages = 1;
-  totalCategories = 0;
   
   categoryForm: FormGroup;
 
   constructor() {
     this.categoryForm = this.fb.group({
-      nombre: ['', [Validators.required, Validators.maxLength(APP_CONSTANTS.VALIDATION.MAX_CATEGORY_NAME_LENGTH)]],
-      descripcion: ['', [Validators.required, Validators.maxLength(APP_CONSTANTS.VALIDATION.MAX_CATEGORY_DESCRIPTION_LENGTH)]]
+      nombre: ['', [
+        Validators.required, 
+        Validators.maxLength(APP_CONSTANTS.VALIDATION.MAX_CATEGORY_NAME_LENGTH)
+      ]],
+      descripcion: ['', [
+        Validators.required, 
+        Validators.maxLength(APP_CONSTANTS.VALIDATION.MAX_CATEGORY_DESCRIPTION_LENGTH)
+      ]]
     });
-  }
-
-  ngOnInit(): void {
+    
     this.loadCategories();
   }
 
   private loadCategories(): void {
-    this.isLoading = true;
-    
-    const options = {
-      page: this.currentPage,
-      pageSize: this.pageSize
-    };
-
-    this.categoryService.getCategories(options).subscribe({
+    this.categoryService.getCategories().subscribe({
       next: (response) => {
-        this.categories = response.categories;
-        this.totalCategories = response.total;
-        this.totalPages = response.totalPages;
-        this.currentPage = response.page;
-        this.isLoading = false;
+        this.categories = response.categories || [];
       },
-      error: () => {
-        this.isLoading = false;
+      error: (error) => {
+        console.error('Error loading categories:', error);
       }
     });
-  }
-
-  editCategory(category: Category): void {
-    this.editingCategory = category;
-    this.showCreateForm = false;
-    this.categoryForm.patchValue({
-      nombre: category.nombre,
-      descripcion: category.descripcion
-    });
-    this.errorMessage = '';
-    this.successMessage = '';
   }
 
   onSubmit(): void {
@@ -222,44 +197,22 @@ export class AdminCategoryListComponent {
       this.errorMessage = '';
       this.successMessage = '';
 
-      const formValue = this.categoryForm.value;
-      
-      if (this.editingCategory) {
-        this.categoryService.updateCategory(this.editingCategory.id, formValue).subscribe({
-          next: (category) => {
-            this.loadCategories();
-            this.successMessage = `Categoría "${category.nombre}" actualizada exitosamente`;
-            this.isLoading = false;
-            setTimeout(() => this.cancelForm(), 2000);
-          },
-          error: (error) => {
-            this.errorMessage = error.message || 'Error al actualizar la categoría';
-            this.isLoading = false;
-          }
-        });
-      } else {
-        this.categoryService.createCategory(formValue).subscribe({
-          next: (category) => {
-            this.loadCategories();
-            this.successMessage = `Categoría "${category.nombre}" creada exitosamente`;
-            this.isLoading = false;
-            setTimeout(() => this.cancelForm(), 2000);
-          },
-          error: (error) => {
-            this.errorMessage = error.message || 'Error al crear la categoría';
-            this.isLoading = false;
-          }
-        });
-      }
+      this.categoryService.createCategory(this.categoryForm.value).subscribe({
+        next: (category) => {
+          this.isLoading = false;
+          this.successMessage = `Categoría "${category.nombre}" creada exitosamente`;
+          this.categoryForm.reset();
+          this.loadCategories();
+          setTimeout(() => {
+            this.successMessage = '';
+          }, 3000);
+        },
+        error: (error) => {
+          this.isLoading = false;
+          this.errorMessage = error.message || 'Error al crear la categoría';
+        }
+      });
     }
-  }
-
-  cancelForm(): void {
-    this.showCreateForm = false;
-    this.editingCategory = null;
-    this.categoryForm.reset();
-    this.errorMessage = '';
-    this.successMessage = '';
   }
 
   deleteCategory(category: Category): void {
@@ -281,10 +234,5 @@ export class AdminCategoryListComponent {
         }
       });
     }
-  }
-
-  onPageChange(page: number): void {
-    this.currentPage = page;
-    this.loadCategories();
   }
 }

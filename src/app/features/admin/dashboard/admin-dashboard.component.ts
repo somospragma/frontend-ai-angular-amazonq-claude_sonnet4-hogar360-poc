@@ -80,17 +80,33 @@ import { CategoryService } from '../../../core/services/category.service';
               </div>
             </a>
 
-            <a routerLink="/admin/categories" 
+            <a routerLink="/admin/locations" 
                class="block p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-md transition-all">
               <div class="flex items-center">
                 <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
                   <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  </svg>
+                </div>
+                <div class="ml-3">
+                  <h4 class="text-sm font-medium text-gray-900">Gestionar Ubicaciones</h4>
+                  <p class="text-xs text-gray-500">Crear y administrar ubicaciones</p>
+                </div>
+              </div>
+            </a>
+            
+            <a routerLink="/admin/categories" 
+               class="block p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-md transition-all">
+              <div class="flex items-center">
+                <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                  <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
                   </svg>
                 </div>
                 <div class="ml-3">
-                  <h4 class="text-sm font-medium text-gray-900">Gestionar Categorías</h4>
-                  <p class="text-xs text-gray-500">Ver y administrar categorías</p>
+                  <h4 class="text-sm font-medium text-gray-900">Ver Categorías</h4>
+                  <p class="text-xs text-gray-500">Administrar categorías</p>
                 </div>
               </div>
             </a>
@@ -100,7 +116,20 @@ import { CategoryService } from '../../../core/services/category.service';
         <!-- Info for non-admin users -->
         <div class="bg-white rounded-lg shadow p-6" *ngIf="!authService.isAdmin()">
           <h3 class="text-lg font-semibold text-gray-900 mb-4">Tu Rol: {{ getRoleLabel(authService.currentUser()?.rol) }}</h3>
-          <p class="text-gray-600">Bienvenido al panel de administración. Las funcionalidades disponibles dependen de tu rol de usuario.</p>
+          <div class="bg-yellow-50 border border-yellow-200 rounded-md p-4">
+            <div class="flex">
+              <svg class="w-5 h-5 text-yellow-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+              </svg>
+              <div>
+                <h4 class="text-sm font-medium text-yellow-800">Acceso Limitado</h4>
+                <p class="text-sm text-yellow-700 mt-1">
+                  Como {{ getRoleLabel(authService.currentUser()?.rol) }}, tienes acceso de solo lectura a ciertas secciones. 
+                  Solo los administradores pueden crear, editar y eliminar ubicaciones y categorías.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
   `
