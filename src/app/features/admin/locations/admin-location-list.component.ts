@@ -1,14 +1,15 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { LocationService } from '../../../core/services/location.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { Location } from '../../../shared/models';
+import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 
 @Component({
   selector: 'app-admin-location-list',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule],
   template: `
     <div>
       <h1 class="text-2xl font-normal text-gray-900 mb-6">{{ authService.isAdmin() ? 'Crear Ubicación' : 'Ubicaciones' }}</h1>
@@ -126,7 +127,28 @@ import { Location } from '../../../shared/models';
         <p class="text-sm text-yellow-800">Solo los administradores pueden crear y eliminar ubicaciones.</p>
       </div>
 
-      <h2 class="text-lg font-medium text-gray-900 mb-4">Ubicaciones existentes</h2>
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-lg font-medium text-gray-900">Ubicaciones existentes</h2>
+        <div class="flex space-x-3">
+          <div class="relative">
+            <input type="text" 
+                   [(ngModel)]="searchText"
+                   (input)="onSearch()"
+                   placeholder="Buscar por ciudad o departamento..."
+                   class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm w-64">
+            <svg class="absolute left-3 top-2.5 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+          </div>
+          <select [(ngModel)]="sortBy" (change)="onSortChange()" class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+            <option value="ciudad">Ordenar por Ciudad</option>
+            <option value="departamento">Ordenar por Departamento</option>
+          </select>
+          <button (click)="toggleSortOrder()" class="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+            {{ sortOrder === 'asc' ? '↑ A-Z' : '↓ Z-A' }}
+          </button>
+        </div>
+      </div>
       
       <div class="bg-white rounded-lg shadow-sm overflow-hidden">
         <table class="min-w-full">
@@ -163,18 +185,37 @@ import { Location } from '../../../shared/models';
         </table>
         
         <!-- Pagination -->
-        <div class="bg-white px-4 py-3 flex items-center justify-center border-t border-gray-200">
+        <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200" *ngIf="totalPages > 1">
+          <div class="text-sm text-gray-700">
+            Mostrando {{ (currentPage - 1) * 10 + 1 }} - {{ Math.min(currentPage * 10, total) }} de {{ total }} ubicaciones
+          </div>
           <nav class="flex space-x-1">
-            <button class="px-3 py-2 text-sm font-medium text-white bg-blue-600 border border-gray-300 rounded">1</button>
-            <button class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded hover:bg-gray-50">2</button>
-            <button class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded hover:bg-gray-50">3</button>
-            <button class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded hover:bg-gray-50">4</button>
-            <button class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded hover:bg-gray-50">
+            <button (click)="goToPage(currentPage - 1)" 
+                    [disabled]="currentPage === 1"
+                    class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+              </svg>
+            </button>
+            
+            <button *ngFor="let page of getPageNumbers()" 
+                    (click)="goToPage(page)"
+                    [class]="page === currentPage ? 'px-3 py-2 text-sm font-medium text-white bg-blue-600 border border-gray-300 rounded' : 'px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded hover:bg-gray-50'">
+              {{ page }}
+            </button>
+            
+            <button (click)="goToPage(currentPage + 1)" 
+                    [disabled]="currentPage === totalPages"
+                    class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
               </svg>
             </button>
           </nav>
+        </div>
+        
+        <div class="bg-white px-4 py-3 text-center text-sm text-gray-500" *ngIf="locations.length === 0">
+          {{ searchText ? 'No se encontraron ubicaciones que coincidan con la búsqueda.' : 'No hay ubicaciones registradas.' }}
         </div>
       </div>
     </div>
@@ -191,8 +232,15 @@ export class AdminLocationListComponent {
   deletingId = '';
   errorMessage = '';
   successMessage = '';
+  searchText = '';
+  sortBy = 'ciudad';
+  sortOrder = 'asc';
+  currentPage = 1;
+  totalPages = 1;
+  total = 0;
   
   locationForm: FormGroup;
+  private searchSubject = new Subject<string>();
 
   constructor() {
     this.locationForm = this.fb.group({
@@ -202,18 +250,79 @@ export class AdminLocationListComponent {
       descripcionDepartamento: ['', [Validators.required, Validators.maxLength(120)]]
     });
     
+    this.searchSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged()
+    ).subscribe(() => {
+      this.currentPage = 1;
+      this.loadLocations();
+    });
+    
     this.loadLocations();
   }
 
   private loadLocations(): void {
-    this.locationService.getLocations().subscribe({
+    const options = {
+      page: this.currentPage,
+      pageSize: 10,
+      search: this.searchText,
+      sortBy: this.sortBy,
+      sortOrder: this.sortOrder
+    };
+    
+    this.locationService.getLocations(options).subscribe({
       next: (response) => {
         this.locations = response.locations || [];
+        this.totalPages = response.totalPages;
+        this.total = response.total;
       },
       error: (error) => {
         console.error('Error loading locations:', error);
       }
     });
+  }
+
+  onSearch(): void {
+    this.searchSubject.next(this.searchText);
+  }
+
+  onSortChange(): void {
+    this.currentPage = 1;
+    this.loadLocations();
+  }
+
+  toggleSortOrder(): void {
+    this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
+    this.currentPage = 1;
+    this.loadLocations();
+  }
+
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.loadLocations();
+    }
+  }
+
+  getPageNumbers(): number[] {
+    const pages: number[] = [];
+    const maxVisible = 5;
+    let start = Math.max(1, this.currentPage - Math.floor(maxVisible / 2));
+    let end = Math.min(this.totalPages, start + maxVisible - 1);
+    
+    if (end - start + 1 < maxVisible) {
+      start = Math.max(1, end - maxVisible + 1);
+    }
+    
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+    
+    return pages;
+  }
+
+  get Math() {
+    return Math;
   }
 
   onSubmit(): void {

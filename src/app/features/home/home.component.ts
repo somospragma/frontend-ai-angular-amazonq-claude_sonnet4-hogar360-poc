@@ -20,6 +20,7 @@ import { AuthService } from '../../core/services/auth.service';
               <a href="#" class="text-gray-600 hover:text-gray-900">Compra</a>
               <a href="#" class="text-gray-600 hover:text-gray-900">Renta</a>
               <a href="#" class="text-gray-600 hover:text-gray-900">Vende</a>
+              <a routerLink="/locations" class="text-gray-600 hover:text-gray-900">Ubicaciones</a>
               <a routerLink="/admin" class="text-gray-600 hover:text-gray-900">Administración</a>
               <a *ngIf="!authService.isAuthenticated()" routerLink="/auth/login" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 inline-block text-center">
                 Ingresar

@@ -49,18 +49,51 @@ export class LocationService {
   getLocations(options?: any): Observable<{locations: Location[], total: number, page: number, totalPages: number}> {
     const page = options?.page || 1;
     const pageSize = options?.pageSize || 10;
+    const searchText = options?.search || '';
+    const sortBy = options?.sortBy || 'ciudad'; // 'ciudad' | 'departamento'
+    const sortOrder = options?.sortOrder || 'asc'; // 'asc' | 'desc'
+    
+    let filteredLocations = [...this.locations];
+    
+    // Filtrar por texto de búsqueda
+    if (searchText.trim()) {
+      const normalizedSearch = this.normalizeText(searchText);
+      filteredLocations = filteredLocations.filter(location => 
+        this.normalizeText(location.ciudad).includes(normalizedSearch) ||
+        this.normalizeText(location.departamento).includes(normalizedSearch)
+      );
+    }
+    
+    // Ordenar
+    filteredLocations.sort((a, b) => {
+      const aValue = this.normalizeText(a[sortBy as keyof Location] as string);
+      const bValue = this.normalizeText(b[sortBy as keyof Location] as string);
+      
+      if (sortOrder === 'asc') {
+        return aValue.localeCompare(bValue);
+      } else {
+        return bValue.localeCompare(aValue);
+      }
+    });
+    
     const startIndex = (page - 1) * pageSize;
     const endIndex = startIndex + pageSize;
-    
-    const paginatedLocations = this.locations.slice(startIndex, endIndex);
-    const totalPages = Math.ceil(this.locations.length / pageSize);
+    const paginatedLocations = filteredLocations.slice(startIndex, endIndex);
+    const totalPages = Math.ceil(filteredLocations.length / pageSize);
 
     return of({
       locations: paginatedLocations,
-      total: this.locations.length,
+      total: filteredLocations.length,
       page,
       totalPages
     }).pipe(delay(500));
+  }
+
+  private normalizeText(text: string): string {
+    return text.toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '') // Remover tildes
+      .trim();
   }
 
   createLocation(locationData: CreateLocationRequest): Observable<Location> {
@@ -132,6 +165,10 @@ export class LocationService {
     this.locations[index] = { ...this.locations[index], ...locationData };
     this.saveToStorage();
     return of(this.locations[index]).pipe(delay(1000));
+  }
+
+  searchLocations(searchText: string, options?: any): Observable<{locations: Location[], total: number, page: number, totalPages: number}> {
+    return this.getLocations({ ...options, search: searchText });
   }
 
   deleteLocation(id: string): Observable<void> {
