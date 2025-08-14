@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { delay } from 'rxjs/operators';
 import { Schedule, CreateScheduleRequest } from '../../shared/models';
@@ -9,6 +9,13 @@ import { Schedule, CreateScheduleRequest } from '../../shared/models';
 export class ScheduleService {
   private readonly STORAGE_KEY = 'hogar360_schedules';
   private schedules: Schedule[] = [];
+  
+  private getAppointmentCount(scheduleId: string): number {
+    const stored = localStorage.getItem('hogar360_appointments');
+    if (!stored) return 0;
+    const appointments = JSON.parse(stored);
+    return appointments.filter((a: any) => a.horarioDisponibleId === scheduleId).length;
+  }
 
   constructor() {
     this.loadFromStorage();
@@ -143,8 +150,9 @@ export class ScheduleService {
       // No mostrar horarios pasados
       if (fechaHoraInicio <= ahora) return false;
       
-      // TODO: Filtrar por cantidad de personas agendadas < 2
-      // Por ahora asumimos que todos están disponibles
+      // No mostrar horarios con 2 o más compradores agendados
+      const appointmentCount = this.getAppointmentCount(schedule.id);
+      if (appointmentCount >= 2) return false;
       
       return true;
     });
