@@ -29,6 +29,10 @@ export const ADMIN_ROUTES: Routes = [
       {
         path: 'properties',
         loadChildren: () => import('./properties/admin-properties.routes').then(m => m.ADMIN_PROPERTIES_ROUTES)
+      },
+      {
+        path: 'schedules',
+        loadChildren: () => import('./schedules/admin-schedules.routes').then(m => m.ADMIN_SCHEDULES_ROUTES)
       }
     ]
   }
