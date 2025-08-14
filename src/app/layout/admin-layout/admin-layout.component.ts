@@ -92,7 +92,7 @@ import { AuthService } from '../../core/services/auth.service';
         </aside>
 
         <!-- Main content -->
-        <main class="flex-1 p-8">
+        <main class="flex-1 p-8 overflow-hidden">
           <router-outlet></router-outlet>
         </main>
       </div>

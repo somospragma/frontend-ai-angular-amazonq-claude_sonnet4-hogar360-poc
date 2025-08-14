@@ -17,7 +17,7 @@ import { AuthService } from '../../core/services/auth.service';
               <h1 class="text-2xl font-normal text-blue-600">Hogar360</h1>
             </div>
             <div class="flex items-center space-x-8">
-              <a href="#" class="text-gray-600 hover:text-gray-900">Compra</a>
+              <a routerLink="/properties" class="text-gray-600 hover:text-gray-900">Propiedades</a>
               <a href="#" class="text-gray-600 hover:text-gray-900">Renta</a>
               <a href="#" class="text-gray-600 hover:text-gray-900">Vende</a>
               <a routerLink="/locations" class="text-gray-600 hover:text-gray-900">Ubicaciones</a>
